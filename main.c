@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <String.h>
+#include <time.h>
 #include "grafolista.h"
 #include "Lista.h"
 
@@ -13,6 +14,7 @@ typedef struct resposta{
     char nome[100];
     int cor;
     int possibilidades[4];
+    int grau;
 } Resposta;
 
 int checarCompativel(No *ini, int cor, Resposta *vet_assignment, int atual, int tamanho)
@@ -109,16 +111,52 @@ void voltarAtualizacao(No *ini, int index, Resposta *vet_assignment, int tamanho
         strcpy(aux, ini->nome);
         for(i = 0; i < tamanho; i++)
         {
-            if(strcmp(aux, vet_assignment[i].nome) == 0)
+            if(strcmp(aux, vet_assignment[i].nome) == 0 && vet_assignment[i].cor == 0)
                 vet_assignment[i].possibilidades[index] = 1;
         }
         ini = ini->prox;
     }
 }
 
+int MVR(Resposta *vet_assignment, int tamanho)
+{
+    int menor = 5, valor, i, retorno;
+    for(i = 0; i < tamanho; i++)
+    {
+        valor = vet_assignment[i].possibilidades[0] + vet_assignment[i].possibilidades[1] + vet_assignment[i].possibilidades[2] +
+        vet_assignment[i].possibilidades[3];
+        if(vet_assignment[i].cor == 0 && menor > valor)
+        {
+            retorno = i;
+            menor = valor;
+        }
+    }
+    return retorno;
+}
+
+int MVRGrau(Resposta *vet_assignment, int tamanho)
+{
+    int menor = 5, valor, i, retorno;
+    for(i = 0; i < tamanho; i++)
+    {
+        valor = vet_assignment[i].possibilidades[0] + vet_assignment[i].possibilidades[1] + vet_assignment[i].possibilidades[2] +
+        vet_assignment[i].possibilidades[3];
+        if(vet_assignment[i].cor == 0 && menor > valor)
+        {
+            retorno = i;
+            menor = valor;
+        }
+        else if(vet_assignment[i].cor == 0 && menor == valor && vet_assignment[i].grau > vet_assignment[retorno].grau)
+        {
+            retorno = i;
+        }
+    }
+    return retorno;
+}
+
 int colorir(LGrafo *g, Resposta *vet_assignment, int atual, int tamanho, char tipo)
 {
-    int i;
+    int i, prox;
     int aux[4];
     if(checarResposta(vet_assignment, tamanho) == 1)
         return 1;
@@ -137,7 +175,13 @@ int colorir(LGrafo *g, Resposta *vet_assignment, int atual, int tamanho, char ti
                 aux[3] = vet_assignment[atual].possibilidades[3];
                 atualizarVerificacaoAdiante(g->lista[atual].ini, i - 1, vet_assignment, atual, tamanho);
             }
-            if(colorir(g, vet_assignment, atual + 1, tamanho, tipo) == 1)
+            if(tipo == 'a' || tipo == 'b')
+                prox = atual + 1;
+            if(tipo == 'c')
+                prox = MVR(vet_assignment, tamanho);
+            if(tipo == 'd')
+                prox = MVRGrau(vet_assignment, tamanho);
+            if(colorir(g, vet_assignment, prox, tamanho, tipo) == 1)
             {
                 return 1;
             }
@@ -173,6 +217,7 @@ int main()
     for(i = 0; i < tamanho; i++)
     {
         vet_assignment[i].cor = 0;
+        vet_assignment[i].grau = 0;
         vet_assignment[i].possibilidades[0] = 1;
         vet_assignment[i].possibilidades[1] = 1;
         vet_assignment[i].possibilidades[2] = 1;
@@ -189,13 +234,14 @@ int main()
             scanf("%[^,^.]", aux);
             getchar();
             Linserir_aresta(&g, i, aux);
+            vet_assignment[i].grau++;
             if(getchar() == '\n')
             {
                 break;
             }
         }
     }
-
     if(colorir(&g, vet_assignment, 0, tamanho, tipo) == 1)
         imprimir_resposta(vet_assignment, tamanho);
+    return 0;
 }

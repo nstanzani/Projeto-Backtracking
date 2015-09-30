@@ -57,13 +57,13 @@ void imprimir_resposta(Resposta *vetor, int tamanho)
     {
         printf("%s: ", vetor[i].nome);
         if(vetor[i].cor == AZUL)
-            printf("Azul\n");
+            printf("Azul.\n");
         else if(vetor[i].cor == VERDE)
-            printf("Verde\n");
+            printf("Verde.\n");
         else if(vetor[i].cor == VERMELHO)
-            printf("Vermelho\n");
+            printf("Vermelho.\n");
         else if(vetor[i].cor == AMARELO)
-            printf("Amarelo\n");
+            printf("Amarelo.\n");
     }
 }
 
@@ -158,6 +158,7 @@ int colorir(LGrafo *g, Resposta *vet_assignment, int atual, int tamanho, char ti
 {
     int i, prox;
     int aux[4];
+    contador++;
     if(checarResposta(vet_assignment, tamanho) == 1)
         return 1;
     else if(tipo != 'a' && verificarAdiante(vet_assignment, tamanho) == 0)

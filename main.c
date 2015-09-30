@@ -158,7 +158,6 @@ int colorir(LGrafo *g, Resposta *vet_assignment, int atual, int tamanho, char ti
 {
     int i, prox;
     int aux[4];
-    contador++;
     if(checarResposta(vet_assignment, tamanho) == 1)
         return 1;
     else if(tipo != 'a' && verificarAdiante(vet_assignment, tamanho) == 0)
